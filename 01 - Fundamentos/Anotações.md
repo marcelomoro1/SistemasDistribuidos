@@ -6,6 +6,7 @@
 - GRID computacional
 - Objetivo de compartilhar recursos: processador e memória, controlando sincronismo
 - Comunicação via socket, sendo ela bloqueante, onde é possivel ler ou escrever
+- Programação multitarefa com thread (mini processo dentro de um processo)  
 
 ### Sistemas paralelos
 - Cluster computacional
