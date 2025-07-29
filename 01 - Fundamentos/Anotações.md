@@ -5,6 +5,7 @@
 - Arquitetura Cliente/Servidor ou Ponto a ponto, sendo escalável, com segurança e manutenção
 - GRID computacional
 - Objetivo de compartilhar recursos: processador e memória, controlando sincronismo
+- Comunicação via socket, sendo ela bloqueante, onde é possivel ler ou escrever
 
 ### Sistemas paralelos
 - Cluster computacional
