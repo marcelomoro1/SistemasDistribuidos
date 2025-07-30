@@ -34,7 +34,7 @@
   E o servidor responde a solicitação, fornecendo o serviço ou recurso solicitado.
 
 ### Rede Ponto a Ponto (P2P)
-- Arquitetur de rede de computadores onde cada nó atua como cliente e servidor simultaneamente,
+- Arquitetura de rede de computadores onde cada nó atua como cliente e servidor simultaneamente,
 permitindo que os dispositivos se comuniquem e compartilhem recursos diretamente, sem a necessidade de um servidor central
 
 ### Cliente/Servidor x Ponto a Ponto
