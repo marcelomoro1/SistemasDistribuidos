@@ -30,3 +30,5 @@
 - **Eleição (Election):** Um algoritmo usado para escolher um processo coordenador ou líder em um sistema distribuído.
     - **Algoritmo do Valentão (Bully Algorithm):** Um processo com falha de líder envia uma mensagem de eleição. Se ele não receber resposta de um processo com identificador maior, ele se declara o novo líder.
     - **Algoritmo em Anel (Ring Algorithm):** Um processo envia uma mensagem de eleição para o próximo no anel, que a repassa. A mensagem circula e o processo com o maior identificador se torna o novo líder.
+
+- **Pool de Threads:** É criado um conjunto fixo ou dinâmico de threads e em vez de criar e destruir threads a todo momento (o que é caro em termos de processamento e memória), o sistema reaproveita threads já existentes.
