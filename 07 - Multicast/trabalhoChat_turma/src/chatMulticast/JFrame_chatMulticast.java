@@ -228,7 +228,7 @@ public class JFrame_chatMulticast extends javax.swing.JFrame {
                             if (!nick.equals(meuNick)) {
                                 mapaUsuarios.put(nick, ipRemetente);
 
-                                // Responde em MULTICAST para que o novo usuário saiba de MIM
+                                // Responde em MULTICAST
                                 String msgResposta = "PRESENT:" + meuNick;
                                 int portaCorreta = Integer.parseInt(jTextField_Porta.getText());
 
@@ -249,7 +249,7 @@ public class JFrame_chatMulticast extends javax.swing.JFrame {
                                 });
                             }
 
-                        // --- Um usuário ANTIGO respondeu ao meu JOIN ---
+                        // --- Um usuário ANTIGO respondeu ao JOIN ---
                         } else if (msgRecebida.startsWith("PRESENT:")) {
                             String nick = msgRecebida.substring(8); // "PRESENT:Joao" -> "Joao"
 
@@ -274,39 +274,31 @@ public class JFrame_chatMulticast extends javax.swing.JFrame {
                                 jTextArea_Mensagens.append("--- " + nick + " saiu da sala ---\n");
                             });
 
-                        // --- É uma mensagem de CHAT normal (Pública ou Privada) ---
                         } else {
 
-                            // --- INÍCIO DA CORREÇÃO DE DUPLICAÇÃO ---
                             if (msgRecebida.startsWith("PRIVADO")) {
                                 try {
-                                    // Formato: "PRIVADO (MARCELO -> ...):"
-                                    // split por " " ou "(":
-                                    // [0] = "PRIVADO"
-                                    // [1] = "" (string vazia entre o espaço e o "(")
-                                    // [2] = "MARCELO"
 
-                                    // ***** ESTA É A LINHA CORRIGIDA *****
                                     String remetente = msgRecebida.split("[\\s(]")[2]; 
 
                                     if (remetente.equals(meuNick)) {
                                         // É uma msg que eu enviei (para outro ou para mim).
                                         // O método enviarMsg() já a exibiu. Ignorar.
-                                        continue; // Pula para a próxima iteração do loop
+                                        continue; 
                                     }
                                 } catch (Exception e) {
-                                    // Erro ao parsear a string, melhor exibir a msg
+
                                     System.err.println("Erro ao parsear msg privada: " + e.getMessage());
                                 }
                             }
-                            // --- FIM DA CORREÇÃO DE DUPLICAÇÃO ---
+
 
                             javax.swing.SwingUtilities.invokeLater(() -> {
                                 jTextArea_Mensagens.append(msgRecebida + "\n");
                             });
                         }
                     } catch (IOException e) {
-                        // Se o socket for fechado (no Sair), a exceção é normal
+
                         if (socket != null && !socket.isClosed()) {
                             JOptionPane.showMessageDialog(meuFrame, e.getMessage());
                         }
@@ -376,11 +368,7 @@ public class JFrame_chatMulticast extends javax.swing.JFrame {
                 String meuNick = jTextField_Nick.getText();
                 listModel.addElement(meuNick);
                 
-                // --- MUDANÇA DA CORREÇÃO 3 ---
-                // Não precisamos mais disso, pois bloqueamos o envio para si mesmo
-                // mapaUsuarios.put(meuNick, InetAddress.getByName("127.0.0.1")); 
-                // --- FIM DA MUDANÇA ---
-                
+      
                 jButton_Conectar.setEnabled(false);
                 jTextField_Nick.setEnabled(false);
                 jTextField_GrupoIP.setEnabled(false);
@@ -418,7 +406,7 @@ public class JFrame_chatMulticast extends javax.swing.JFrame {
                 int porta = Integer.parseInt(jTextField_Porta.getText());
 
                 if (usuarioSelecionado == null) {
-                    // --- Cenário 1: Mensagem PÚBLICA (Multicast) ---
+                    // (Multicast)
                     ipDestino = jTextField_GrupoIP.getText();
                     msgCompleta = "GERAL " + meuNick + ": " + msgTexto;
 
@@ -426,15 +414,13 @@ public class JFrame_chatMulticast extends javax.swing.JFrame {
                     socket.send(pacote);
 
                 } else {
-                    // --- Cenário 2: Mensagem PRIVADA (Unicast) ---
+                    // (Unicast)
 
-                    // --- INÍCIO DA CORREÇÃO 3 ---
                     if (usuarioSelecionado.equals(meuNick)) {
                         jTextArea_Mensagens.append("--- Você não pode enviar uma mensagem privada para si mesmo ---\n");
                         jTextField_textoDeEnvio.setText("");
                         return; // Para a execução
                     }
-                    // --- FIM DA CORREÇÃO 3 ---
 
                     InetAddress ipUsuario = mapaUsuarios.get(usuarioSelecionado);
                     if (ipUsuario == null) {
@@ -448,18 +434,12 @@ public class JFrame_chatMulticast extends javax.swing.JFrame {
                     DatagramPacket pacote = ComunicadorUDP.montaMensagem(msgCompleta, ipDestino, porta);
                     socket.send(pacote);
 
-                    // Adiciona a *mesma* mensagem na SUA tela
                     jTextArea_Mensagens.append(msgCompleta + "\n");
                 }
 
-                // --- INÍCIO DA CORREÇÃO 1 e 2 ---
-                // REMOVE o envio duplicado e o clearSelection
-                // DatagramPacket pacote = ... (REMOVIDO)
-                // socket.send(pacote);         (REMOVIDO)
+
 
                 jTextField_textoDeEnvio.setText("");
-                // jList1.clearSelection(); // REMOVIDO (Bug 2)
-                // --- FIM DA CORREÇÃO 1 e 2 ---
 
             } catch (IOException | NumberFormatException | NullPointerException e) {
                 if (e.getClass().toString().equals("class java.lang.NullPointerException")) {
