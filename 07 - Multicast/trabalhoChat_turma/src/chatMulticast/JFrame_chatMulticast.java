@@ -35,7 +35,7 @@ public class JFrame_chatMulticast extends javax.swing.JFrame {
     }
 
     @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
     private void initComponents() {
 
         jPanel_Chat = new javax.swing.JPanel();
@@ -199,7 +199,7 @@ public class JFrame_chatMulticast extends javax.swing.JFrame {
         );
 
         pack();
-    }// </editor-fold>//GEN-END:initComponents
+    }// </editor-fold>                        
 
     /**
      * classe interna que garante que o processo de ler/ouvir mensagens seja executado concomitantemente
@@ -228,7 +228,7 @@ public class JFrame_chatMulticast extends javax.swing.JFrame {
                             if (!nick.equals(meuNick)) {
                                 mapaUsuarios.put(nick, ipRemetente);
 
-                                // Responde em MULTICAST
+                                // Responde em MULTICAST 
                                 String msgResposta = "PRESENT:" + meuNick;
                                 int portaCorreta = Integer.parseInt(jTextField_Porta.getText());
 
@@ -249,11 +249,11 @@ public class JFrame_chatMulticast extends javax.swing.JFrame {
                                 });
                             }
 
-                        // --- Um usuário ANTIGO respondeu ao JOIN ---
+                        // --- Um usuário ANTIGO respondeu ao meu JOIN ---
                         } else if (msgRecebida.startsWith("PRESENT:")) {
                             String nick = msgRecebida.substring(8); // "PRESENT:Joao" -> "Joao"
 
-                            // Ignora o seu próprio "PRESENT" (que será recebido via loopback)
+
                             if (!nick.equals(meuNick)) {
                                 mapaUsuarios.put(nick, ipRemetente);
 
@@ -262,9 +262,9 @@ public class JFrame_chatMulticast extends javax.swing.JFrame {
                                         listModel.addElement(nick);
                                     }
                                 });
-                            } // Fim do if !nick.equals(meuNick)
+                            } 
 
-                        // --- Um usuário SAIU ---
+                        //usuário SAIU 
                         } else if (msgRecebida.startsWith("LEAVE:")) {
                             String nick = msgRecebida.substring(6); // "LEAVE:Maria" -> "Maria"
                             mapaUsuarios.remove(nick);
@@ -274,7 +274,9 @@ public class JFrame_chatMulticast extends javax.swing.JFrame {
                                 jTextArea_Mensagens.append("--- " + nick + " saiu da sala ---\n");
                             });
 
+
                         } else {
+
 
                             if (msgRecebida.startsWith("PRIVADO")) {
                                 try {
@@ -284,7 +286,7 @@ public class JFrame_chatMulticast extends javax.swing.JFrame {
                                     if (remetente.equals(meuNick)) {
                                         // É uma msg que eu enviei (para outro ou para mim).
                                         // O método enviarMsg() já a exibiu. Ignorar.
-                                        continue; 
+                                        continue;
                                     }
                                 } catch (Exception e) {
 
@@ -302,7 +304,7 @@ public class JFrame_chatMulticast extends javax.swing.JFrame {
                         if (socket != null && !socket.isClosed()) {
                             JOptionPane.showMessageDialog(meuFrame, e.getMessage());
                         }
-                        break; // Sai do loop se o socket fechar
+                        break;
                     }
                 }
             }
@@ -342,7 +344,7 @@ public class JFrame_chatMulticast extends javax.swing.JFrame {
      * é circundado por thread de leitura
      * @param evt contém o evento recebido pelo tratador
      */
-    private void jButton_ConectarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_ConectarActionPerformed
+    private void jButton_ConectarActionPerformed(java.awt.event.ActionEvent evt) {                                                 
         jTextField_GrupoIP.getText();
         jTextField_Porta.getText();
         try {
@@ -368,7 +370,6 @@ public class JFrame_chatMulticast extends javax.swing.JFrame {
                 String meuNick = jTextField_Nick.getText();
                 listModel.addElement(meuNick);
                 
-      
                 jButton_Conectar.setEnabled(false);
                 jTextField_Nick.setEnabled(false);
                 jTextField_GrupoIP.setEnabled(false);
@@ -382,7 +383,7 @@ public class JFrame_chatMulticast extends javax.swing.JFrame {
         } catch (HeadlessException | IOException | NumberFormatException e) {
             JOptionPane.showMessageDialog(this, e.getMessage());
         }
-    }//GEN-LAST:event_jButton_ConectarActionPerformed
+    }                                                
    
     /**
      * método privado que captura a mensagem escrita na caixa de texto mais o apelido da caixa de texto nick
@@ -406,30 +407,33 @@ public class JFrame_chatMulticast extends javax.swing.JFrame {
                 int porta = Integer.parseInt(jTextField_Porta.getText());
 
                 if (usuarioSelecionado == null) {
-                    // (Multicast)
+                    //Multicast
                     ipDestino = jTextField_GrupoIP.getText();
-                    msgCompleta = "GERAL " + meuNick + ": " + msgTexto;
+
+                    msgCompleta = "PUBLICO " + meuNick + ": " + msgTexto;
 
                     DatagramPacket pacote = ComunicadorUDP.montaMensagem(msgCompleta, ipDestino, porta);
                     socket.send(pacote);
 
                 } else {
-                    // (Unicast)
+                    //UNICAST
 
                     if (usuarioSelecionado.equals(meuNick)) {
                         jTextArea_Mensagens.append("--- Você não pode enviar uma mensagem privada para si mesmo ---\n");
                         jTextField_textoDeEnvio.setText("");
-                        return; // Para a execução
+                        return; 
                     }
 
                     InetAddress ipUsuario = mapaUsuarios.get(usuarioSelecionado);
                     if (ipUsuario == null) {
-                        jTextArea_Mensagens.append("--- ERRO: Não foi possível encontrar o IP de " + usuarioSelecionado + " ---\n");
+
+                        jTextArea_Mensagens.append("--- ERRO: O IP de " + usuarioSelecionado + " ainda não foi descoberto. Tente novamente em alguns segundos. ---\n");
                         return;
                     }
 
                     ipDestino = ipUsuario.getHostAddress();
-                    msgCompleta = "PARTICULAR (" + meuNick + " -> " + usuarioSelecionado + "): " + msgTexto;
+
+                    msgCompleta = "PRIVADO (" + meuNick + " -> " + usuarioSelecionado + "): " + msgTexto;
 
                     DatagramPacket pacote = ComunicadorUDP.montaMensagem(msgCompleta, ipDestino, porta);
                     socket.send(pacote);
@@ -437,8 +441,7 @@ public class JFrame_chatMulticast extends javax.swing.JFrame {
                     jTextArea_Mensagens.append(msgCompleta + "\n");
                 }
 
-
-
+                // Limpa o texto
                 jTextField_textoDeEnvio.setText("");
 
             } catch (IOException | NumberFormatException | NullPointerException e) {
@@ -454,32 +457,32 @@ public class JFrame_chatMulticast extends javax.swing.JFrame {
      * método privado que trata o envio de mensagens escritas na caixa de texto de mensagens 
      * @param evt contém o evento recebido pelo tratador
      */
-    private void jButton_EnviarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_EnviarActionPerformed
+    private void jButton_EnviarActionPerformed(java.awt.event.ActionEvent evt) {                                               
         try {
             this.enviarMsg();
             jTextField_textoDeEnvio.requestFocus();
         } catch (IOException | NumberFormatException | NullPointerException e) {
 
         }
-    }//GEN-LAST:event_jButton_EnviarActionPerformed
+    }                                              
 
     /**
      * método privado que trata o evento do botão sair, ou seja, finaliza o sistema
      * @param evt contém o evento recebido pelo tratador
      */
-    private void jButton_SairActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_SairActionPerformed
+    private void jButton_SairActionPerformed(java.awt.event.ActionEvent evt) {                                             
         try {
             this.sairDoSistema();
         } catch (IOException | NumberFormatException | NullPointerException e) {
 
         }
-    }//GEN-LAST:event_jButton_SairActionPerformed
+    }                                            
 
     /**
      * método privado que trata o pressionamento das teclas Enter ou Esc quando o foco estiver na caixa de envio de texto
      * @param evt contém o evento recebido pelo tratador
      */
-    private void jTextField_textoDeEnvioKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField_textoDeEnvioKeyPressed
+    private void jTextField_textoDeEnvioKeyPressed(java.awt.event.KeyEvent evt) {                                                   
         // TODO add your handling code here:
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
             try {
@@ -496,7 +499,7 @@ public class JFrame_chatMulticast extends javax.swing.JFrame {
 
             }
         }
-    }//GEN-LAST:event_jTextField_textoDeEnvioKeyPressed
+    }                                                  
 
     /**
      * @param args the command line arguments
@@ -545,7 +548,7 @@ public class JFrame_chatMulticast extends javax.swing.JFrame {
     
     
     
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+    // Variables declaration - do not modify                     
     private javax.swing.JButton jButton_Conectar;
     private javax.swing.JButton jButton_Enviar;
     private javax.swing.JButton jButton_Sair;
@@ -563,5 +566,5 @@ public class JFrame_chatMulticast extends javax.swing.JFrame {
     private javax.swing.JTextField jTextField_Nick;
     private javax.swing.JTextField jTextField_Porta;
     private javax.swing.JTextField jTextField_textoDeEnvio;
-    // End of variables declaration//GEN-END:variables
+    // End of variables declaration                   
 }
