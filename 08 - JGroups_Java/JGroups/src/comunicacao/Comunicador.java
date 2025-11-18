@@ -41,6 +41,7 @@ public class Comunicador extends ReceiverAdapter {
      * Inicia a conexão com o canal JGroups e solicita o
      * histórico de mensagens (State Transfer).
      */
+    //Quando clicar em entrar instancia o Jchannel, registra a classe como responsável por tratar os eventos e guarda o chat numa variável e conecta na rede
     public void iniciar(JFrame_chatJGROUPS meuFrame) throws Exception {
 
         System.setProperty("java.net.preferIPv4Stack", "true");//desabilita ipv6
@@ -54,13 +55,14 @@ public class Comunicador extends ReceiverAdapter {
 
 
         System.out.println("Conectado. Solicitando histórico (estado)...");
-        this.channel.getState(null, 10000); // Timeout de 10 seg
+        this.channel.getState(null, 10000); // Timeout de 10 seg, para receber as mensagens antigas do grupo
 
         if (membrosStringBuffer != null) {
              this.meuFrame.getjTextArea_listaMembros().setText(membrosStringBuffer.toString());
         }
     }
 
+    //envia a msg
     public void enviar(String frase, String participante) {
         try {
             if (participante == null) {
@@ -74,7 +76,8 @@ public class Comunicador extends ReceiverAdapter {
                     System.err.println("ERRO: Lista de membros ainda não foi inicializada.");
                     return;
                 }
-                
+
+                //encontra o participante pela lista
                 for (int i = 0; i < this.listaMembros.size(); i++) {
                     if (participante.equals(listaMembros.get(i).toString())) {
                         System.out.println("Achouuuu (destino da msg privada)");
@@ -96,13 +99,14 @@ public class Comunicador extends ReceiverAdapter {
         }
     }
 
-
+    //sair
     public void finalizar() {
         if (this.channel != null) {
             this.channel.close();
         }
     }
 
+    //marca a hora de quando chegou a msg
     @Override
     public void receive(Message msg) {
         Date dt = new Date();
@@ -121,7 +125,8 @@ public class Comunicador extends ReceiverAdapter {
         });
     }
 
-
+    
+    //verifica quando alguem entra ou sai
     @Override
     public void viewAccepted(View view_atual) {
         
